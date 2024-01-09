@@ -54,11 +54,15 @@ final class MovieQuizViewController: UIViewController {
     @IBOutlet private weak var imageView: UIImageView!
     @IBOutlet private weak var textLabel: UILabel!
     @IBOutlet private weak var counterLabel: UILabel!
+    @IBOutlet private weak var yesButton: UIButton!
+    @IBOutlet private weak var noButton: UIButton!
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         show(quiz :convert(model: questions[currentQuestionIndex]))
+        imageView.layer.masksToBounds = true // даём разрешение на рисование рамки
+        imageView.layer.cornerRadius = 20 // радиус скругления углов рамки
     }
     
     // приватный метод конвертации, который принимает моковый вопрос и возвращает вью модель для главного экрана
@@ -79,10 +83,10 @@ final class MovieQuizViewController: UIViewController {
     // приватный метод, который меняет цвет рамки
     // принимает на вход булево значение и ничего не возвращает
     private func showAnswerResult(isCorrect: Bool) {
-        imageView.layer.masksToBounds = true // даём разрешение на рисование рамки
+        noButton.isEnabled = false
+        yesButton.isEnabled = false
         imageView.layer.borderWidth = 8 // толщина рамки
         imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor // делаем рамку зеленой или красной в зависимости от ответа
-        imageView.layer.cornerRadius = 20 // радиус скругления углов рамки
         if isCorrect {
             correctAnswers += 1
         }
@@ -93,6 +97,8 @@ final class MovieQuizViewController: UIViewController {
             // код, который мы хотим вызвать через 1 секунду
             self.showNextQuestionOrResults()
             self.imageView.layer.borderWidth = 0
+            self.noButton.isEnabled = true
+            self.yesButton.isEnabled = true
         }
     }
     
