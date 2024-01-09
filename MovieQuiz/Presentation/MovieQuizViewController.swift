@@ -15,36 +15,6 @@ final class MovieQuizViewController: UIViewController {
         QuizQuestion(image:"Tesla", text:"Рейтинг этого фильма больше чем 6?", correctAnswer: false),
         QuizQuestion(image:"Vivarium", text:"Рейтинг этого фильма больше чем 6?", correctAnswer: false)]
     
-    private struct QuizQuestion {
-        // строка с названием фильма,
-        // совпадает с названием картинки афиши фильма в Assets
-        let image: String
-        // строка с вопросом о рейтинге фильма
-        let text: String
-        // булево значение (true, false), правильный ответ на вопрос
-        let correctAnswer: Bool
-    }
-    
-    // вью модель для состояния "Вопрос показан"
-    private struct QuizStepViewModel {
-        // картинка с афишей фильма с типом UIImage
-        let image: UIImage
-        // вопрос о рейтинге квиза
-        let question: String
-        // строка с порядковым номером этого вопроса (ex. "1/10")
-        let questionNumber: String
-    }
-    
-    // для состояния "Результат квиза"
-    private struct QuizResultsViewModel {
-        // строка с заголовком алерта
-        let title: String
-        // строка с текстом о количестве набранных очков
-        let text: String
-        // текст для кнопки алерта
-        let buttonText: String
-    }
-    
     // переменная с индексом текущего вопроса, начальное значение 0
     // (по этому индексу будем искать вопрос в массиве, где индекс первого элемента 0, а не 1)
     private var currentQuestionIndex = 0
