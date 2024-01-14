@@ -7,7 +7,7 @@
 
 import Foundation
 
-class QuestionFactory {
+class QuestionFactory: QuestionFactoryProtocol {
     // массив вопросов
     private let questions: [QuizQuestion] = [
         QuizQuestion(image:"The Godfather", text:"Рейтинг этого фильма больше чем 6?", correctAnswer: true),
@@ -21,11 +21,15 @@ class QuestionFactory {
         QuizQuestion(image:"Tesla", text:"Рейтинг этого фильма больше чем 6?", correctAnswer: false),
         QuizQuestion(image:"Vivarium", text:"Рейтинг этого фильма больше чем 6?", correctAnswer: false)]
     
-    func requestNextQuestion() -> QuizQuestion? { // функция будет возвращать nil, если получить следующий вопрос невозможно
+    weak var delegate: QuestionFactoryDelegate?
+    
+    func requestNextQuestion() {
         guard let index = (0..<questions.count).randomElement() else {
-            return nil
-        } // вопрос должен быть случайным
+            delegate?.didReceiveNextQuestion(question: nil)
+            return
+        }
         
-        return questions[safe: index] // Subscript – это, по сути, сокращённый путь к члену коллекции. А subscript safe — функция, которую мы добавили в расширении массива. Она поможет безопасно достать из него элемент: если индекс выйдет за пределы размера массива, вместо крэша нам просто вернётся nil.
+        let question = questions[safe: index]
+        delegate?.didReceiveNextQuestion(question: question)
     }
 }
