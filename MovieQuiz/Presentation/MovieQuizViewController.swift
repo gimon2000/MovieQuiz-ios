@@ -11,10 +11,15 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     @IBOutlet private weak var imageView: UIImageView!
     @IBOutlet private weak var textLabel: UILabel!
     @IBOutlet private weak var counterLabel: UILabel!
+    @IBOutlet weak var yesButton: UIButton!
+    @IBOutlet weak var noButton: UIButton!
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        imageView.layer.masksToBounds = true
+        imageView.layer.cornerRadius = 20
+        
         let questionFactory = QuestionFactory()
         questionFactory.delegate = self
         questionFactory.requestNextQuestion()
@@ -53,10 +58,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     }
     
     private func showAnswerResult(isCorrect: Bool) {
-        imageView.layer.masksToBounds = true
+        noButton.isEnabled = false
+        yesButton.isEnabled = false
         imageView.layer.borderWidth = 8
         imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
-        imageView.layer.cornerRadius = 20
         if isCorrect {
             correctAnswers += 1
         }
@@ -65,6 +70,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
             
             self.showNextQuestionOrResults()
             self.imageView.layer.borderWidth = 0
+            self.noButton.isEnabled = true
+            self.yesButton.isEnabled = true
         }
     }
     
