@@ -9,7 +9,7 @@ import UIKit
 
 class AlertPresenter {
     
-    weak var delegate: ShowAlertDelegate?
+    weak var delegate: (UIViewController & ShowAlertDelegate)?
     
     func requestShowAlert(alertModel: AlertModel?) {
         guard let alertModel = alertModel else {
@@ -23,6 +23,6 @@ class AlertPresenter {
         
         let action = UIAlertAction(title: alertModel.buttonText, style: .default){ _ in alertModel.completion() }
         alert.addAction(action)
-        delegate?.showAlert(alert: alert)
+        delegate?.present(alert, animated: true, completion: nil)
     }
 }

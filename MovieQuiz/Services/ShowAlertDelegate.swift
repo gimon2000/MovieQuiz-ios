@@ -8,5 +8,4 @@
 import UIKit
 
 protocol ShowAlertDelegate: AnyObject {
-    func showAlert(alert: UIAlertController)
 }

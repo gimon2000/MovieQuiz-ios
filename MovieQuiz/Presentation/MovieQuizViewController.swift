@@ -2,11 +2,12 @@ import UIKit
 
 final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, ShowAlertDelegate {
     
+    private let questionsAmount: Int = 10
     private var currentQuestionIndex = 0
     private var correctAnswers = 0
-    private let questionsAmount: Int = 10
     private var questionFactory: QuestionFactoryProtocol?
     private var currentQuestion: QuizQuestion?
+    private var statisticService: StatisticService?
     
     @IBOutlet private weak var imageView: UIImageView!
     @IBOutlet private weak var textLabel: UILabel!
@@ -24,6 +25,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         questionFactory.delegate = self
         questionFactory.requestNextQuestion()
         self.questionFactory = questionFactory
+        
+        self.statisticService = StatisticServiceImplementation()
     }
     
     // MARK: - QuestionFactoryDelegate
@@ -38,12 +41,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
             self?.show(quiz: viewModel)
         }
     }
-    
-    // MARK: - ShowAlertDelegate
-    func showAlert(alert: UIAlertController) {
-        self.present(alert, animated: true, completion: nil)
-    }
-    
+        
     private func convertQuestionToViewModel(model: QuizQuestion) -> QuizStepViewModel {
         QuizStepViewModel(
             image: UIImage(named: model.image) ?? UIImage(),
@@ -77,9 +75,20 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     
     private func showNextQuestionOrResults() {
         if currentQuestionIndex == questionsAmount - 1 {
-            let text = correctAnswers == questionsAmount ?
-            "Поздравляем, вы ответили на 10 из 10!" :
-            "Вы ответили на \(correctAnswers) из 10, попробуйте ещё раз!"
+            statisticService?.store(correct: correctAnswers, total: questionsAmount)
+            guard let count = statisticService?.gamesCount else {
+                return
+            }
+            guard let bestGame = statisticService?.bestGame else {
+                return
+            }
+            guard let totalAccuracy = statisticService?.totalAccuracy else {
+                return
+            }
+            let dateFormatter = DateFormatter()
+            let date = bestGame.date
+            dateFormatter.dateFormat = "dd.MM.yy' 'HH:mm"
+            let text = "Ваш результат: \(correctAnswers)/10\nКоличество сыгранных квизов: \(count)\nРекорд: \(bestGame.correct)/10 (\(dateFormatter.string(from: date)))\nСредняя точность: \(String(format: "%.2f", totalAccuracy))%"
             
             let alertModel = AlertModel(title: "Этот раунд окончен!",
                                         message: text,
