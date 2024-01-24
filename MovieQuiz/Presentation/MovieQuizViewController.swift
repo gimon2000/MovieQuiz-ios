@@ -8,12 +8,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     private var questionFactory: QuestionFactoryProtocol?
     private var currentQuestion: QuizQuestion?
     private var statisticService: StatisticService?
+    private var alertPresenter: AlertPresenter?
     
     @IBOutlet private weak var imageView: UIImageView!
     @IBOutlet private weak var textLabel: UILabel!
     @IBOutlet private weak var counterLabel: UILabel!
-    @IBOutlet weak var yesButton: UIButton!
-    @IBOutlet weak var noButton: UIButton!
+    @IBOutlet private weak var yesButton: UIButton!
+    @IBOutlet private weak var noButton: UIButton!
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -27,6 +28,12 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         self.questionFactory = questionFactory
         
         self.statisticService = StatisticServiceImplementation()
+        alertPresenter = AlertPresenter()
+        alertPresenter?.delegate = self
+    }
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
     }
     
     // MARK: - QuestionFactoryDelegate
@@ -41,7 +48,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
             self?.show(quiz: viewModel)
         }
     }
-        
+    
     private func convertQuestionToViewModel(model: QuizQuestion) -> QuizStepViewModel {
         QuizStepViewModel(
             image: UIImage(named: model.image) ?? UIImage(),
@@ -88,7 +95,12 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
             let dateFormatter = DateFormatter()
             let date = bestGame.date
             dateFormatter.dateFormat = "dd.MM.yy' 'HH:mm"
-            let text = "Ваш результат: \(correctAnswers)/10\nКоличество сыгранных квизов: \(count)\nРекорд: \(bestGame.correct)/10 (\(dateFormatter.string(from: date)))\nСредняя точность: \(String(format: "%.2f", totalAccuracy))%"
+            let text = """
+Ваш результат: \(correctAnswers)/10
+Количество сыгранных квизов: \(count)
+Рекорд: \(bestGame.correct)/10 (\(dateFormatter.string(from: date)))
+Средняя точность: \(String(format: "%.2f", totalAccuracy))%
+"""
             
             let alertModel = AlertModel(title: "Этот раунд окончен!",
                                         message: text,
@@ -101,9 +113,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
                 
                 self.questionFactory?.requestNextQuestion()
             })
-            let alertPresenter = AlertPresenter()
-            alertPresenter.delegate = self
-            alertPresenter.requestShowAlert(alertModel: alertModel)
+            alertPresenter?.requestShowAlert(alertModel: alertModel)
         } else {
             currentQuestionIndex += 1
             questionFactory?.requestNextQuestion()
