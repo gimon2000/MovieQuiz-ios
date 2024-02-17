@@ -2,8 +2,7 @@ import UIKit
 
 final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, ShowAlertDelegate {
     
-    private let questionsAmount: Int = 10
-    private var currentQuestionIndex = 0
+    private let presenter = MovieQuizPresenter()
     private var correctAnswers = 0
     private var questionFactory: QuestionFactoryProtocol?
     private var currentQuestion: QuizQuestion?
@@ -45,7 +44,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         }
         
         currentQuestion = question
-        let viewModel = convertQuestionToViewModel(model: question)
+        let viewModel = presenter.convertQuestionToViewModel(model: question)
         DispatchQueue.main.async { [weak self] in
             self?.show(quiz: viewModel)
         }
@@ -73,26 +72,20 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     private func showNetworkError(message: String) {
         hideLoadingIndicator()
         
-        let alertModel = AlertModel(title: "Что-то пошло не так(",
-                                    message: message,
-                                    buttonText: "Попробовать еще раз",
-                                    completion: { [weak self] in
+        let alertModel = AlertModel(
+            title: "Что-то пошло не так(",
+            message: message,
+            buttonText: "Попробовать еще раз")
+        { [weak self] in
             guard let self = self else { return }
             
-            self.currentQuestionIndex = 0
+            self.presenter.resetQuestionIndex()
             self.correctAnswers = 0
             
             showLoadingIndicator()
             self.questionFactory?.loadData()
-        })
+        }
         alertPresenter?.requestShowAlert(alertModel: alertModel)
-    }
-    
-    private func convertQuestionToViewModel(model: QuizQuestion) -> QuizStepViewModel {
-        QuizStepViewModel(
-            image: UIImage(data: model.image) ?? UIImage(),
-            question: model.text,
-            questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
     }
     
     private func show(quiz step: QuizStepViewModel) {
@@ -109,7 +102,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         if isCorrect {
             correctAnswers += 1
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) 
+        { [weak self] in
             guard let self = self else { return }
             
             self.showNextQuestionOrResults()
@@ -120,8 +114,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     }
     
     private func showNextQuestionOrResults() {
-        if currentQuestionIndex == questionsAmount - 1 {
-            statisticService?.store(correct: correctAnswers, total: questionsAmount)
+        if presenter.isLastQuestion() {
+            statisticService?.store(correct: correctAnswers, total: presenter.questionsAmount)
             guard let count = statisticService?.gamesCount else {
                 return
             }
@@ -141,20 +135,20 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
 Средняя точность: \(String(format: "%.2f", totalAccuracy))%
 """
             
-            let alertModel = AlertModel(title: "Этот раунд окончен!",
-                                        message: text,
-                                        buttonText: "Сыграть ещё раз",
-                                        completion: { [weak self] in
+            let alertModel = AlertModel(
+                title: "Этот раунд окончен!",
+                message: text,
+                buttonText: "Сыграть ещё раз")
+            { [weak self] in
                 guard let self = self else { return }
                 
-                self.currentQuestionIndex = 0
+                self.presenter.resetQuestionIndex()
                 self.correctAnswers = 0
-                
                 self.questionFactory?.requestNextQuestion()
-            })
+            }
             alertPresenter?.requestShowAlert(alertModel: alertModel)
         } else {
-            currentQuestionIndex += 1
+            presenter.switchToNextQuestion()
             questionFactory?.requestNextQuestion()
         }
     }
