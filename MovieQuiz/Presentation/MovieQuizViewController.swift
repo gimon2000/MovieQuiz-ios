@@ -3,7 +3,6 @@ import UIKit
 final class MovieQuizViewController: UIViewController, ShowAlertDelegate {
     
     private var presenter: MovieQuizPresenter!
-    private var statisticService: StatisticService?
     private var alertPresenter: AlertPresenter?
     
     @IBOutlet private weak var imageView: UIImageView!
@@ -19,8 +18,6 @@ final class MovieQuizViewController: UIViewController, ShowAlertDelegate {
         imageView.layer.masksToBounds = true
         imageView.layer.cornerRadius = 20
         
-        statisticService = StatisticServiceImplementation()
-        
         alertPresenter = AlertPresenter()
         alertPresenter?.delegate = self
         
@@ -32,7 +29,6 @@ final class MovieQuizViewController: UIViewController, ShowAlertDelegate {
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
     }
-    
     
     func showLoadingIndicator() {
         activityIndicator.isHidden = false
@@ -55,8 +51,7 @@ final class MovieQuizViewController: UIViewController, ShowAlertDelegate {
             guard let self = self else { return }
             
             self.showLoadingIndicator()
-            self.presenter.questionFactory?.loadData()
-            self.presenter.restartGame()
+            self.presenter.loadDataFromServer()
         }
         alertPresenter?.requestShowAlert(alertModel: alertModel)
     }
@@ -65,31 +60,38 @@ final class MovieQuizViewController: UIViewController, ShowAlertDelegate {
         imageView.image = step.image
         textLabel.text = step.question
         counterLabel.text = step.questionNumber
+        self.imageView.layer.borderWidth = 0
+        self.noButton.isEnabled = true
+        self.yesButton.isEnabled = true
     }
     
-    func showAnswerResult(isCorrect: Bool) {
-        noButton.isEnabled = false
-        yesButton.isEnabled = false
+    func highlightImageBorder(isCorrectAnswer: Bool) {
         imageView.layer.borderWidth = 8
-        imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0)
+        imageView.layer.borderColor = isCorrectAnswer ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
+    }
+    
+    func showAlertResults() {
+        let alertModel = AlertModel(
+            title: "Этот раунд окончен!",
+            message: self.presenter.makeResultsMessage(),
+            buttonText: "Сыграть ещё раз")
         { [weak self] in
             guard let self = self else { return }
             
-            self.presenter.statisticService = self.statisticService
-            self.presenter.alertPresenter = self.alertPresenter
-            self.presenter.showNextQuestionOrResults()
-            self.imageView.layer.borderWidth = 0
-            self.noButton.isEnabled = true
-            self.yesButton.isEnabled = true
+            self.presenter.restartGame()
         }
+        alertPresenter?.requestShowAlert(alertModel: alertModel)
     }
     
     @IBAction private func noButtonClicked(_ sender: UIButton) {
+        noButton.isEnabled = false
+        yesButton.isEnabled = false
         presenter.noButtonClicked()
     }
     
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
+        noButton.isEnabled = false
+        yesButton.isEnabled = false
         presenter.yesButtonClicked()
     }
 }
