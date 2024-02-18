@@ -1,6 +1,6 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController, ShowAlertDelegate {
+final class MovieQuizViewController: UIViewController, ShowAlertDelegate, MovieQuizViewControllerProtocol {
     
     private var presenter: MovieQuizPresenter!
     private var alertPresenter: AlertPresenter?
