@@ -67,7 +67,7 @@ class QuestionFactory: QuestionFactoryProtocol {
             let correctAnswer = rating > Float(ratingRandom)
             
             let question = QuizQuestion(image: imageData,
-                                        text: text,
+                                        textQuestion: text,
                                         correctAnswer: correctAnswer)
             
             DispatchQueue.main.async { [weak self] in
