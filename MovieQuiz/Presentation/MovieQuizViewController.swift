@@ -2,7 +2,7 @@ import UIKit
 
 final class MovieQuizViewController: UIViewController, ShowAlertDelegate, MovieQuizViewControllerProtocol {
     
-    private var presenter: MovieQuizPresenter!
+    private var presenter: MovieQuizPresenter?
     private var alertPresenter: AlertPresenter?
     
     @IBOutlet private weak var imageView: UIImageView!
@@ -51,7 +51,7 @@ final class MovieQuizViewController: UIViewController, ShowAlertDelegate, MovieQ
             guard let self = self else { return }
             
             self.showLoadingIndicator()
-            self.presenter.loadDataFromServer()
+            self.presenter?.loadDataFromServer()
         }
         alertPresenter?.requestShowAlert(alertModel: alertModel)
     }
@@ -72,24 +72,24 @@ final class MovieQuizViewController: UIViewController, ShowAlertDelegate, MovieQ
     func showAlertResults() {
         let alertModel = AlertModel(
             title: "Этот раунд окончен!",
-            message: self.presenter.makeResultsMessage(),
+            message: self.presenter?.makeResultsMessage() ?? "Fail get results",
             buttonText: "Сыграть ещё раз")
         { [weak self] in
             guard let self = self else { return }
             
-            self.presenter.restartGame()
+            self.presenter?.restartGame()
         }
         alertPresenter?.requestShowAlert(alertModel: alertModel)
     }
     
     @IBAction private func noButtonClicked(_ sender: UIButton) {
         changeButtonState(isEnabled: false)
-        presenter.noButtonClicked()
+        presenter?.noButtonClicked()
     }
     
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
         changeButtonState(isEnabled: false)
-        presenter.yesButtonClicked()
+        presenter?.yesButtonClicked()
     }
     
     private func changeButtonState(isEnabled: Bool) {

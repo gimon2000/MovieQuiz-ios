@@ -9,7 +9,7 @@ import XCTest
 @testable import MovieQuiz
 
 final class MovieQuizPresenterTests: XCTestCase {
-    func testPresenterConvertModel() throws {
+    private func testPresenterConvertModel() throws {
         let viewControllerMock = MovieQuizViewControllerMock()
         let sut = MovieQuizPresenter(viewController: viewControllerMock)
         

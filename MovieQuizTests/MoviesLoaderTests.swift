@@ -9,7 +9,7 @@ import XCTest
 @testable import MovieQuiz
 
 final class MoviesLoaderTests: XCTestCase {
-    func testSuccessLoading () throws {
+    private func testSuccessLoading () throws {
         //Given
         let stubNetworkClient = StubNetworkClient(emulateError: false)
         let loader = MoviesLoader(networkClient: stubNetworkClient)
@@ -31,7 +31,7 @@ final class MoviesLoaderTests: XCTestCase {
         waitForExpectations(timeout: 1)
     }
     
-    func testFailureLoading () throws {
+    private func testFailureLoading () throws {
         //Given
         let stubNetworkClient = StubNetworkClient(emulateError: true)
         let loader = MoviesLoader(networkClient: stubNetworkClient)

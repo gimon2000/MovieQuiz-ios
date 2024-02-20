@@ -72,7 +72,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     func convertQuestionToViewModel(model: QuizQuestion) -> QuizStepViewModel {
         QuizStepViewModel(
             image: UIImage(data: model.image) ?? UIImage(),
-            question: model.text,
+            question: model.textQuestion,
             questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)"
         )
     }
