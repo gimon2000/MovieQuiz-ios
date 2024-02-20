@@ -14,7 +14,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     private var correctAnswers = 0
     private var currentQuestion: QuizQuestion?
     private var questionFactory: QuestionFactoryProtocol?
-    private let statisticService: StatisticService!
+    private let statisticService: StatisticService?
     private weak var viewController: MovieQuizViewControllerProtocol?
     
     init(viewController: MovieQuizViewControllerProtocol) {
@@ -86,6 +86,9 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     }
     
     func makeResultsMessage() -> String {
+        guard let statisticService = statisticService else {
+            return "Fail get results"
+        }
         statisticService.store(correct: correctAnswers, total: questionsAmount)
         let count = statisticService.gamesCount
         let bestGame = statisticService.bestGame

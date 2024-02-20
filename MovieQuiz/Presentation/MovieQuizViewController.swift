@@ -60,9 +60,8 @@ final class MovieQuizViewController: UIViewController, ShowAlertDelegate, MovieQ
         imageView.image = step.image
         textLabel.text = step.question
         counterLabel.text = step.questionNumber
-        self.imageView.layer.borderWidth = 0
-        self.noButton.isEnabled = true
-        self.yesButton.isEnabled = true
+        imageView.layer.borderWidth = 0
+        changeButtonState(isEnabled: true)
     }
     
     func highlightImageBorder(isCorrectAnswer: Bool) {
@@ -84,14 +83,17 @@ final class MovieQuizViewController: UIViewController, ShowAlertDelegate, MovieQ
     }
     
     @IBAction private func noButtonClicked(_ sender: UIButton) {
-        noButton.isEnabled = false
-        yesButton.isEnabled = false
+        changeButtonState(isEnabled: false)
         presenter.noButtonClicked()
     }
     
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
-        noButton.isEnabled = false
-        yesButton.isEnabled = false
+        changeButtonState(isEnabled: false)
         presenter.yesButtonClicked()
+    }
+    
+    private func changeButtonState(isEnabled: Bool) {
+        noButton.isEnabled = isEnabled
+        yesButton.isEnabled = isEnabled
     }
 }
